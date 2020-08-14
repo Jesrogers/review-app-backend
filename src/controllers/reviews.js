@@ -1,0 +1,1 @@
+const getReviews = (req, res) => {};
