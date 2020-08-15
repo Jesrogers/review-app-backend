@@ -51,20 +51,58 @@ const createReview = async (req, res) => {
 
   try {
     const savedReview = await db.query(
-      'INSERT INTO review (title, description, rating) VALUES ($1, $2, $3) RETURNING id',
+      'INSERT INTO review (title, description, rating) VALUES ($1, $2, $3) RETURNING id, title, description, rating',
       [title, description, rating]
     );
 
-    const savedReviewId = savedReview.rows[0].id;
-
     const newReview = {
-      id: savedReviewId,
-      title: title,
-      description: description,
-      rating: rating,
+      id: savedReview.rows[0].id,
+      title: savedReview.rows[0].title,
+      description: savedReview.rows[0].description,
+      rating: savedReview.rows[0].rating,
     };
 
     res.status(201).json(newReview);
+  } catch (err) {
+    logger.error(err);
+  }
+};
+
+const updateReview = async (req, res) => {
+  const { id, title, description, rating } = req.body;
+
+  if (!title || title.length > 100) {
+    return res
+      .status(400)
+      .json({ error: 'Review title missing or above 100 characters' });
+  }
+
+  if (description.length > 300) {
+    return res
+      .status(400)
+      .json({ error: 'Review description above 300 characters' });
+  }
+
+  if (!rating || typeof rating !== 'number') {
+    return res
+      .status(400)
+      .json({ error: 'Review rating missing or not a number' });
+  }
+
+  try {
+    const updatedReview = await db.query(
+      'UPDATE review SET title = $1, description = $2, rating = $3 WHERE id = $4 RETURNING title, description, rating',
+      [title, description, rating, id]
+    );
+
+    const newReview = {
+      id: id,
+      title: updatedReview.rows[0].title,
+      description: updatedReview.rows[0].description,
+      rating: updatedReview.rows[0].rating,
+    };
+
+    res.status(200).json(newReview);
   } catch (err) {
     logger.error(err);
   }
@@ -89,5 +127,6 @@ module.exports = {
   getReviews,
   getReview,
   createReview,
+  updateReview,
   deleteReview,
 };
