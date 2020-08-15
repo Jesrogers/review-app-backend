@@ -70,8 +70,24 @@ const createReview = async (req, res) => {
   }
 };
 
+const deleteReview = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ error: 'No id supplied for deletion' });
+  }
+
+  try {
+    await db.query('DELETE FROM review WHERE id = $1', [Number(id)]);
+    res.status(204).end();
+  } catch (err) {
+    logger.error(error);
+  }
+};
+
 module.exports = {
   getReviews,
   getReview,
   createReview,
+  deleteReview,
 };
