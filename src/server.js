@@ -5,6 +5,7 @@ const middleware = require('./utils/middleware');
 const logger = require('./utils/logger');
 
 const app = express();
+app.use(express.json());
 
 app.use('/api/reviews', reviewsRouter);
 
