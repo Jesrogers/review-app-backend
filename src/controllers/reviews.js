@@ -19,7 +19,7 @@ const getReview = async (req, res) => {
     ]);
 
     if (review.rows.length) {
-      res.status(200).json(review.rows);
+      res.status(200).json(review.rows[0]);
     } else {
       res.status(404).end();
     }
@@ -43,10 +43,8 @@ const createReview = async (req, res) => {
       .json({ error: 'Review description above 300 characters' });
   }
 
-  if (!rating || typeof rating !== 'number') {
-    return res
-      .status(400)
-      .json({ error: 'Review rating missing or not a number' });
+  if (typeof rating !== 'number' && rating >= 0 && rating <= 5) {
+    return res.status(400).json({ error: 'Review rating not valid' });
   }
 
   try {
@@ -83,7 +81,7 @@ const updateReview = async (req, res) => {
       .json({ error: 'Review description above 300 characters' });
   }
 
-  if (!rating || typeof rating !== 'number') {
+  if (typeof rating !== 'number') {
     return res
       .status(400)
       .json({ error: 'Review rating missing or not a number' });
@@ -91,12 +89,12 @@ const updateReview = async (req, res) => {
 
   try {
     const updatedReview = await db.query(
-      'UPDATE review SET title = $1, description = $2, rating = $3 WHERE id = $4 RETURNING title, description, rating',
+      'UPDATE review SET title = $1, description = $2, rating = $3 WHERE id = $4 RETURNING title, description, rating, id',
       [title, description, rating, id]
     );
 
     const newReview = {
-      id: id,
+      id: updatedReview.rows[0].id,
       title: updatedReview.rows[0].title,
       description: updatedReview.rows[0].description,
       rating: updatedReview.rows[0].rating,
