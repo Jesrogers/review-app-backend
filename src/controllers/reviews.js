@@ -43,7 +43,7 @@ const createReview = async (req, res) => {
       .json({ error: 'Review description above 300 characters' });
   }
 
-  if (typeof rating !== 'number' && rating >= 0 && rating <= 5) {
+  if (typeof rating !== 'number' && rating > 0 && rating <= 5) {
     return res.status(400).json({ error: 'Review rating not valid' });
   }
 
