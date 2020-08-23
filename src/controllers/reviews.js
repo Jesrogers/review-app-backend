@@ -1,5 +1,6 @@
 const db = require('../db');
 const logger = require('../utils/logger');
+const { reviewValidation } = require('../validation');
 
 const getReviews = async (req, res) => {
   try {
@@ -29,23 +30,13 @@ const getReview = async (req, res) => {
 };
 
 const createReview = async (req, res) => {
+  const { error } = reviewValidation(req.body);
+
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
+
   const { title, description, rating } = req.body;
-
-  if (!title || title.length > 100) {
-    return res
-      .status(400)
-      .json({ error: 'Review title missing or above 100 characters' });
-  }
-
-  if (description.length > 300) {
-    return res
-      .status(400)
-      .json({ error: 'Review description above 300 characters' });
-  }
-
-  if (typeof rating !== 'number' && rating > 0 && rating <= 5) {
-    return res.status(400).json({ error: 'Review rating not valid' });
-  }
 
   try {
     const savedReview = await db.query(
@@ -67,25 +58,13 @@ const createReview = async (req, res) => {
 };
 
 const updateReview = async (req, res) => {
+  const { error } = reviewValidation(req.body);
+
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
+
   const { id, title, description, rating } = req.body;
-
-  if (!title || title.length > 100) {
-    return res
-      .status(400)
-      .json({ error: 'Review title missing or above 100 characters' });
-  }
-
-  if (description.length > 300) {
-    return res
-      .status(400)
-      .json({ error: 'Review description above 300 characters' });
-  }
-
-  if (typeof rating !== 'number') {
-    return res
-      .status(400)
-      .json({ error: 'Review rating missing or not a number' });
-  }
 
   try {
     const updatedReview = await db.query(
@@ -110,7 +89,7 @@ const deleteReview = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    return res.status(400).json({ error: 'No id supplied for deletion' });
+    return res.status(400).send('No id supplied for deletion');
   }
 
   try {
