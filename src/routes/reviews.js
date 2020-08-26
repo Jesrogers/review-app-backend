@@ -1,4 +1,5 @@
 const reviewsRouter = require('express').Router();
+const authorizeJWT = require('../middleware/authorizeJWT');
 const {
   getReviews,
   getReview,
@@ -7,10 +8,10 @@ const {
   deleteReview,
 } = require('../controllers/reviews');
 
-reviewsRouter.get('/', getReviews);
-reviewsRouter.get('/:id', getReview);
-reviewsRouter.post('/', createReview);
-reviewsRouter.put('/:id', updateReview);
-reviewsRouter.delete('/:id', deleteReview);
+reviewsRouter.get('/', authorizeJWT, getReviews);
+reviewsRouter.get('/:id', authorizeJWT, getReview);
+reviewsRouter.post('/', authorizeJWT, createReview);
+reviewsRouter.put('/:id', authorizeJWT, updateReview);
+reviewsRouter.delete('/:id', authorizeJWT, deleteReview);
 
 module.exports = reviewsRouter;
