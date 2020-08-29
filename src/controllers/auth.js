@@ -4,7 +4,7 @@ const { valid } = require('joi');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
@@ -20,7 +20,7 @@ const register = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = await db.query(
-      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *',
+      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
       [username, passwordHash]
     );
 
@@ -36,7 +36,7 @@ const register = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
@@ -44,13 +44,23 @@ const login = async (req, res) => {
       username,
     ]);
 
+    if (user.rows.length === 0) {
+      return next({
+        status: 401,
+        message: 'Invalid username or password',
+      });
+    }
+
     const validLogin =
-      !user.rows.length === 0
+      user.rows.length === 0
         ? false
         : await bcrypt.compare(password, user.rows[0].password);
 
     if (!validLogin) {
-      return res.status(401).json('');
+      return next({
+        status: 401,
+        message: 'Invalid username or password',
+      });
     }
 
     const accessToken = jwt.sign(
@@ -58,11 +68,20 @@ const login = async (req, res) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: '1hr' }
     );
+    res.cookie('token', accessToken, { httpOnly: true });
 
-    res.json({ accessToken: accessToken });
+    res.json({ message: 'Logged in' });
   } catch (err) {
-    logger.error(err);
+    res.json({ error: 'Test Error' });
   }
 };
 
-module.exports = { register, login };
+const isVerified = (req, res, next) => {
+  try {
+    res.json(true);
+  } catch (err) {
+    return next({ status: 500, message: 'Internal Server Error' });
+  }
+};
+
+module.exports = { register, login, isVerified };
