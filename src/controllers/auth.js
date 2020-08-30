@@ -76,6 +76,15 @@ const login = async (req, res, next) => {
   }
 };
 
+const logout = (req, res) => {
+  try {
+    res.clearCookie('token');
+    res.json({ message: 'Logout successful' });
+  } catch (err) {
+    return next({ status: 500, message: 'Internal Server Error' });
+  }
+};
+
 const isVerified = (req, res, next) => {
   try {
     res.json(true);
@@ -84,4 +93,4 @@ const isVerified = (req, res, next) => {
   }
 };
 
-module.exports = { register, login, isVerified };
+module.exports = { register, login, logout, isVerified };
