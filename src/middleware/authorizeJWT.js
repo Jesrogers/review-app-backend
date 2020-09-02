@@ -5,7 +5,7 @@ const authorizeJWT = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    next({ status: 401, message: 'Unauthorized' });
+    return next({ status: 401, message: 'Unauthorized' });
   }
 
   try {

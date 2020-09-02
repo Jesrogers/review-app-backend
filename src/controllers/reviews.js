@@ -1,55 +1,54 @@
 const db = require('../db');
-const logger = require('../utils/logger');
 const { reviewValidation } = require('../validation');
 
 const getReviews = async (req, res) => {
-  const { id } = req.user;
+  const { id: userId } = req.user;
 
   try {
     const reviews = await db.query(
       'SELECT * FROM review WHERE created_by = $1',
-      [id]
+      [userId]
     );
     res.status(200).json(reviews.rows);
-  } catch (e) {
-    logger.error(e);
+  } catch (err) {
+    next(err);
   }
 };
 
 const getReview = async (req, res, next) => {
-  const { id } = req.user;
+  const { id: userId } = req.user;
   const reviewId = req.params.id;
 
   try {
     const review = await db.query(
       'SELECT * FROM review WHERE id = $1 AND created_by = $2',
-      [reviewId, id]
+      [reviewId, userId]
     );
 
     if (review.rows.length) {
       res.status(200).json(review.rows[0]);
     } else {
-      next({ status: 404, message: 'no review found' });
+      return next({ status: 404, message: 'No review found' });
     }
   } catch (err) {
-    logger.error(err);
+    next(err);
   }
 };
 
-const createReview = async (req, res) => {
+const createReview = async (req, res, next) => {
   const { error } = reviewValidation(req.body);
 
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return next(error);
   }
 
   const { title, description, rating } = req.body;
-  const { id } = req.user;
+  const { id: userId } = req.user;
 
   try {
     const savedReview = await db.query(
       'INSERT INTO review (title, description, rating, created_by) VALUES ($1, $2, $3, $4) RETURNING *',
-      [title, description, rating, id]
+      [title, description, rating, userId]
     );
 
     const newReview = {
@@ -62,7 +61,7 @@ const createReview = async (req, res) => {
 
     res.status(201).json(newReview);
   } catch (err) {
-    logger.error(err);
+    next(err);
   }
 };
 
@@ -70,11 +69,11 @@ const updateReview = async (req, res, next) => {
   const { error } = reviewValidation(req.body);
 
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return next(error);
   }
 
   const { title, description, rating } = req.body;
-  const reviewId = Number(req.params.id);
+  const { id: reviewId } = req.params;
   const { id: userId } = req.user;
 
   try {
@@ -84,7 +83,7 @@ const updateReview = async (req, res, next) => {
     );
 
     if (!updatedReview.rows[0]) {
-      next({ status: 404, message: 'No review found for this user' });
+      return next({ status: 404, message: 'No review found for this user' });
     }
 
     const newReview = {
@@ -96,22 +95,26 @@ const updateReview = async (req, res, next) => {
 
     res.status(200).json(newReview);
   } catch (err) {
-    logger.error(err);
+    next(err);
   }
 };
 
-const deleteReview = async (req, res) => {
-  const { id } = req.params;
+const deleteReview = async (req, res, next) => {
+  const { id: reviewId } = req.params;
+  const { id: userId } = req.user;
 
-  if (!id) {
-    return res.status(400).send('No id supplied for deletion');
+  if (!reviewId) {
+    return res.next({ status: 400, message: 'No id supplied for deletion' });
   }
 
   try {
-    await db.query('DELETE FROM review WHERE id = $1', [Number(id)]);
+    await db.query('DELETE FROM review WHERE id = $1 AND created_by = $2', [
+      reviewId,
+      userId,
+    ]);
     res.status(204).end();
   } catch (err) {
-    logger.error(error);
+    next(err);
   }
 };
 
