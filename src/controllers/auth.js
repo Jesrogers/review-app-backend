@@ -1,5 +1,4 @@
 const db = require('../db');
-const logger = require('../utils/logger');
 const { valid } = require('joi');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -32,7 +31,7 @@ const register = async (req, res, next) => {
 
     res.json({ accessToken: accessToken });
   } catch (err) {
-    logger.error(err);
+    next(err);
   }
 };
 
@@ -72,16 +71,16 @@ const login = async (req, res, next) => {
 
     res.json({ message: 'Logged in' });
   } catch (err) {
-    res.json({ error: 'Test Error' });
+    next(err);
   }
 };
 
-const logout = (req, res) => {
+const logout = (req, res, next) => {
   try {
     res.clearCookie('token');
     res.json({ message: 'Logout successful' });
   } catch (err) {
-    return next({ status: 500, message: 'Internal Server Error' });
+    next(err);
   }
 };
 
@@ -89,7 +88,7 @@ const isVerified = (req, res, next) => {
   try {
     res.json(true);
   } catch (err) {
-    return next({ status: 500, message: 'Internal Server Error' });
+    next(err);
   }
 };
 
