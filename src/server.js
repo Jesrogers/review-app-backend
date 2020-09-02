@@ -10,7 +10,7 @@ const logger = require('./utils/logger');
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(cors());
 
 app.use('/api/auth', authRouter);
@@ -19,7 +19,7 @@ app.use('/api/reviews', reviewsRouter);
 app.use(unknownEndpoint);
 app.use(errorHandler);
 
-const PORT = process.env.port || 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(
   PORT,
   logger.info(`Review app listening at http://localhost:${PORT}`)

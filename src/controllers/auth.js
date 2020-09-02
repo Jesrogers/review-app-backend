@@ -1,9 +1,15 @@
 const db = require('../db');
-const { valid } = require('joi');
+const { registerValidation } = require('../validation');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const register = async (req, res, next) => {
+  const { error } = registerValidation(req.body);
+
+  if (error) {
+    return next(error);
+  }
+
   const { username, password } = req.body;
 
   try {
@@ -67,8 +73,7 @@ const login = async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: '1hr' }
     );
-    res.cookie('token', accessToken, { httpOnly: true });
-
+    res.cookie('token', accessToken, { httpOnly: true, signed: true });
     res.json({ message: 'Logged in' });
   } catch (err) {
     next(err);
