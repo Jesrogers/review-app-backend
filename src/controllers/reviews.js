@@ -1,7 +1,7 @@
 const db = require('../db');
 const { reviewValidation } = require('../validation');
 
-const getReviews = async (req, res) => {
+const getReviews = async (req, res, next) => {
   const { id: userId } = req.user;
 
   try {
@@ -17,7 +17,7 @@ const getReviews = async (req, res) => {
 
 const getReview = async (req, res, next) => {
   const { id: userId } = req.user;
-  const reviewId = req.params.id;
+  const { id: reviewId } = req.params;
 
   try {
     const review = await db.query(
