@@ -1,5 +1,6 @@
 const reviewsRouter = require('express').Router();
 const authorizeJWT = require('../middleware/authorizeJWT');
+const rateLimiter = require('../middleware/rateLimiter');
 const {
   getReviews,
   getReview,
@@ -10,8 +11,8 @@ const {
 
 reviewsRouter.get('/', authorizeJWT, getReviews);
 reviewsRouter.get('/:id', authorizeJWT, getReview);
-reviewsRouter.post('/', authorizeJWT, createReview);
-reviewsRouter.put('/:id', authorizeJWT, updateReview);
+reviewsRouter.post('/', rateLimiter, authorizeJWT, createReview);
+reviewsRouter.put('/:id', rateLimiter, authorizeJWT, updateReview);
 reviewsRouter.delete('/:id', authorizeJWT, deleteReview);
 
 module.exports = reviewsRouter;
