@@ -4,13 +4,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const register = async (req, res, next) => {
-  const { error } = registerValidation(req.body);
+  const { error, value } = registerValidation(req.body);
 
   if (error) {
     return next(error);
   }
 
-  const { username, password } = req.body;
+  const { username, password } = value;
 
   try {
     const user = await db.query('SELECT * FROM users WHERE username = $1', [

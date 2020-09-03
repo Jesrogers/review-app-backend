@@ -36,13 +36,13 @@ const getReview = async (req, res, next) => {
 };
 
 const createReview = async (req, res, next) => {
-  const { error } = reviewValidation(req.body);
+  const { error, value } = reviewValidation(req.body);
 
   if (error) {
     return next(error);
   }
 
-  const { title, description, rating } = req.body;
+  const { title, description, rating } = value;
   const { id: userId } = req.user;
 
   try {

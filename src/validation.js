@@ -12,7 +12,7 @@ const reviewValidation = (data) => {
 
 const registerValidation = (data) => {
   const reviewSchema = Joi.object({
-    username: Joi.string().alphanum().max(100).required(),
+    username: Joi.string().lowercase().alphanum().max(100).required(),
     password: Joi.string().max(200).required(),
     repeatPassword: Joi.ref('password'),
   }).with('password', 'repeatPassword');
