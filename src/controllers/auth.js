@@ -35,7 +35,11 @@ const register = async (req, res, next) => {
       { expiresIn: '1hr' }
     );
 
-    res.cookie('token', accessToken, { httpOnly: true, signed: true });
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+    });
     res.json({ message: 'Registered and logged in' });
   } catch (err) {
     next(err);
@@ -74,7 +78,11 @@ const login = async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: '1hr' }
     );
-    res.cookie('token', accessToken, { httpOnly: true, signed: true });
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      signed: true,
+      secure: true,
+    });
     res.json({ message: 'Logged in' });
   } catch (err) {
     next(err);
