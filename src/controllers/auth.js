@@ -35,7 +35,8 @@ const register = async (req, res, next) => {
       { expiresIn: '1hr' }
     );
 
-    res.json({ accessToken: accessToken });
+    res.cookie('token', accessToken, { httpOnly: true, signed: true });
+    res.json({ message: 'Registered and logged in' });
   } catch (err) {
     next(err);
   }
