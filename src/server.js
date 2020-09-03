@@ -19,7 +19,7 @@ app.use('/api/reviews', reviewsRouter);
 app.use(unknownEndpoint);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(
   PORT,
   logger.info(`Review app listening at http://localhost:${PORT}`)
