@@ -10,8 +10,8 @@ const logger = require('./utils/logger');
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(cors());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use('/api/auth', authRouter);
 app.use('/api/reviews', reviewsRouter);
