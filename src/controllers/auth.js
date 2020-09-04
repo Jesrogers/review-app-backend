@@ -38,7 +38,6 @@ const register = async (req, res, next) => {
     res.cookie('token', accessToken, {
       httpOnly: true,
       signed: true,
-      secure: true,
     });
     res.json({ message: 'Registered and logged in' });
   } catch (err) {
@@ -81,7 +80,6 @@ const login = async (req, res, next) => {
     res.cookie('token', accessToken, {
       httpOnly: true,
       signed: true,
-      secure: true,
     });
     res.json({ message: 'Logged in' });
   } catch (err) {
