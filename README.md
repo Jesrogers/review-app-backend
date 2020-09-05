@@ -32,7 +32,7 @@ For the frontend repository, please visit [https://github.com/Jesrogers/review-a
 ## Video Demo and Screenshots
 
 ### Video
-[![video demo](https://i.imgur.com/BX2ndjb.png)](http://www.youtube.com/watch?v=cO7tq4hRWA8)
+[![video demo](https://i.imgur.com/Pg2N0md.png)](https://www.youtube.com/watch?v=S09ONmMOyGQ)
 
 ### Reviews area
 
