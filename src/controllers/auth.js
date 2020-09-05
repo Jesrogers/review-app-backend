@@ -35,10 +35,15 @@ const register = async (req, res, next) => {
       { expiresIn: '1hr' }
     );
 
-    res.cookie('token', accessToken, {
+    const cookieConfig = {
       httpOnly: true,
       signed: true,
-    });
+      secure: process.env.NODE_ENV === 'production' ? true : false,
+      sameSite: true,
+    };
+
+    res.cookie('token', accessToken, cookieConfig);
+
     res.json({ message: 'Registered and logged in' });
   } catch (err) {
     next(err);
@@ -77,10 +82,15 @@ const login = async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: '1hr' }
     );
-    res.cookie('token', accessToken, {
+
+    const cookieConfig = {
       httpOnly: true,
       signed: true,
-    });
+      secure: process.env.NODE_ENV === 'production' ? true : false,
+      sameSite: true,
+    };
+
+    res.cookie('token', accessToken, cookieConfig);
     res.json({ message: 'Logged in' });
   } catch (err) {
     next(err);
